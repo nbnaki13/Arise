@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<meta name="theme-color" content="#ECEAFB"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<title>Ace 3.0</title>
+<link rel="manifest" href="manifest.webmanifest"/>
+<link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237A7BEA'/%3E%3Cstop offset='1' stop-color='%239F8FF4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='17' fill='url(%23g)'/%3E%3Cpath d='M8 44c6-4.5 10-4.5 16 0s10 4.5 16 0 10-4.5 16 0v20H8Z' fill='rgba(255,255,255,.22)'/%3E%3Cpath d='M8 50c6-4.5 10-4.5 16 0s10 4.5 16 0 10-4.5 16 0v14H8Z' fill='rgba(255,255,255,.26)'/%3E%3Cpath d='M35.5 8 19 34.5h9.8L26.5 54 45 26h-11z' fill='%23fff'/%3E%3C/svg%3E"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<style>
+/* ============ ACE 3.0 — "Still Water" design system ============
+   Lavender canvas, pillowy white cards, one periwinkle primary,
+   liquid-fill vitality gauge, pastel icon tiles, diamond FAB.
+   Type: Plus Jakarta Sans (UI) · Sora (numerals). */
+:root{
+  --bg:#ECEAFB; --bg2:#E3E0F8; --card:#FFFFFF; --card2:#F6F5FD;
+  --ink:#24223C; --muted:#8B89A8; --faint:#B9B7D2;
+  --line:rgba(36,34,60,0.06); --track:#EDECF9;
+  --primary:#7A7BEA; --primary2:#9F8FF4; --deep:#5C5EE0;
+  --prim-soft:#EEEDFD; --prim-glow:rgba(122,123,234,0.32);
+  --sleep:#7A7BEA; --move:#FF8A5C; --mind:#2FC4C3; --nutri:#54BB74; --hydra:#4D9FFF;
+  --decay:#F0647C; --decay-soft:#FDEEF2;
+  --sh:0 2px 6px rgba(76,72,150,.07), 0 20px 48px rgba(76,72,150,.16);
+  --sh-sm:0 1px 2px rgba(76,72,150,.06), 0 10px 26px rgba(76,72,150,.10);
+  --sh-fab:0 6px 14px rgba(92,94,224,.35), 0 14px 30px rgba(92,94,224,.4);
+  --r-xl:30px; --r-lg:24px; --r-md:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+body{background:var(--bg);color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;overscroll-behavior-y:none;
+  background-image:radial-gradient(circle at 14% -6%, rgba(140,120,255,.30), transparent 44%),radial-gradient(circle at 108% 14%, rgba(122,123,234,.22), transparent 46%),radial-gradient(circle at -10% 80%, rgba(159,143,244,.14), transparent 40%),linear-gradient(180deg,#DDD8F8 0%,#E8E5FA 36%,#F0EEFC 100%);
+  background-attachment:fixed}
+::selection{background:rgba(122,123,234,0.28)}
+::-webkit-scrollbar{width:0;height:0}
+input,select,textarea,button{font-family:inherit;color:inherit}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.num{font-family:'Sora','Plus Jakarta Sans',sans-serif;letter-spacing:-0.02em}
+.eyebrow{font-size:.6563rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.card{background:linear-gradient(180deg,#FFFFFF 0%,#FCFBFF 100%);border:1px solid rgba(96,92,170,.09);border-radius:var(--r-lg);box-shadow:var(--sh-sm),inset 0 1px 0 rgba(255,255,255,.95)}
+button{cursor:pointer;background:none;border:none}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes popIn{0%{opacity:0;transform:scale(.9)}100%{opacity:1;transform:scale(1)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+.notice{border-radius:var(--r-xl);padding:20px;box-shadow:var(--sh);animation:rise .35s cubic-bezier(.22,1,.36,1);margin-bottom:12px}
+.notice-brand{background:linear-gradient(140deg,#EFECFE 0%,#FFFFFF 52%,#F1EAFE 100%);border:1px solid rgba(122,123,234,.18);box-shadow:var(--sh),inset 0 1px 0 rgba(255,255,255,.9)}
+.notice-decay{background:linear-gradient(140deg,#FDF0F4,#FFFFFF 70%);border:1px solid rgba(240,100,124,.16)}
+.bar{height:8px;border-radius:99px;background:var(--track);overflow:hidden;box-shadow:inset 0 1px 2px rgba(76,72,150,.12)}
+.bar>i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--primary),var(--primary2));transition:width .5s cubic-bezier(.22,1,.36,1)}
+.tapbtn{min-width:44px;min-height:48px;display:flex;align-items:center;justify-content:center;border-radius:18px;background:linear-gradient(180deg,#F8F7FE,#EFEDFB);color:var(--ink);font-weight:700;font-size:.875rem;transition:transform .1s,filter .15s;border:none;box-shadow:inset 0 1px 0 #fff,0 2px 6px rgba(76,72,150,.07)}
+.tapbtn:active{transform:scale(.96);filter:brightness(.97)}
+.pillbtn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:999px;background:var(--card);box-shadow:var(--sh-sm);border:1px solid var(--line);font-weight:700;font-size:.8125rem;transition:transform .1s}
+.pillbtn:active{transform:scale(.96)}
+.pillbtn.solid{background:linear-gradient(150deg,#8B87F1 0%,var(--primary) 45%,var(--primary2) 100%);color:#fff;border:none;box-shadow:0 8px 20px var(--prim-glow),inset 0 1px 0 rgba(255,255,255,.4)}
+.iconbtn{width:44px;height:44px;border-radius:50%;background:linear-gradient(180deg,#FFFFFF,#F7F6FE);box-shadow:var(--sh-sm),inset 0 1px 0 #fff;border:1px solid rgba(96,92,170,.09);display:flex;align-items:center;justify-content:center;position:relative;transition:transform .1s}
+.iconbtn:active{transform:scale(.94)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:999px;background:var(--card);border:1px solid var(--line);box-shadow:var(--sh-sm);font-size:.6875rem;font-weight:700;color:var(--muted)}
+.field label{display:block;font-size:.6875rem;color:var(--muted);margin-bottom:6px;font-weight:700}
+.field input,.field select{width:100%;padding:13px 14px;border-radius:var(--r-md);border:1px solid var(--line);background:var(--card2);font-size:.9375rem;font-weight:600}
+.rowbtn{width:100%;display:flex;justify-content:space-between;align-items:center;padding:16px 18px;background:var(--card);font-size:.875rem;font-weight:600;border:none}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.tile{display:flex;flex-direction:column;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:13px 6px 11px;box-shadow:var(--sh-sm);transition:transform .1s;color:var(--ink);text-align:center;position:relative}
+.tile:active{transform:scale(.96)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const {useState,useEffect,useMemo,useRef,useCallback} = React;
+
+/* ================================================================
+   DATE HELPERS (all LOCAL time; Asia/Kathmandu on device)
+================================================================ */
+const pad2 = n => String(n).padStart(2,"0");
+const ld = (d=new Date()) => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+const parseLd = s => { const [y,m,dd]=s.split("-").map(Number); return new Date(y,m-1,dd); };
+const addDays = (s,n) => { const d=parseLd(s); d.setDate(d.getDate()+n); return ld(d); };
+const weekday = s => parseLd(s).getDay();               // 0=Sun
+const weekStart = s => addDays(s, -weekday(s));          // Sunday-start week
+const daysBetween = (a,b) => Math.round((parseLd(b)-parseLd(a))/86400000);
+const fmtDay = s => parseLd(s).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});
+
+/* ================================================================
+   ENGINE — pure functions only. No UI concerns below this line.
+================================================================ */
+
+/* Automaticity: Lally et al. 2010 asymptotic model.
+   A = 100·(1 − e^(−k·R)), k chosen so 66 effective reps ≈ 95%. */
+const K_AUTO = -Math.log(0.05)/66;
+const automaticity = R => 100*(1-Math.exp(-K_AUTO*Math.max(0,R)));
+const stageOf = a => a>=95 ? "Installed" : a>=70 ? "Nearly automatic" : a>=30 ? "Forming" : "Effortful";
+
+const isScheduled = (q,dateStr) => {
+  if (q.schedule.kind==="weekly") return true;           // any day can host a session
+  if (q.schedule.kind==="days") return q.schedule.days.includes(weekday(dateStr));
+  return true;                                            // daily
+};
+
+/* raw logged value for a quest on a date */
+const rawP = (log,dateStr,qid) => (log[dateStr]||{})[qid];
+const hasP = (log,dateStr,qid) => log[dateStr]!==undefined && log[dateStr][qid]!==undefined;
+const numP = (log,dateStr,q) => {
+  const v = rawP(log,dateStr,q.id);
+  if (v===undefined) return 0;
+  if (q.type==="checklist") return Object.values(v||{}).filter(Boolean).length;
+  return Number(v)||0;
+};
+const targetOf = q => q.type==="checklist" ? q.items.length : q.type==="binary" ? 1 : q.target;
+
+/* Forward scan of one DAILY-type quest from creation to `upTo`.
+   Produces per-day status + effective reps with the miss-decay rule:
+   1st consecutive miss: no decay ("never miss twice").
+   nth consecutive miss (n≥2): R −= (n−1). Floor 0. */
+function scanDaily(q, log, upTo){
+  const statuses = {};                     // date -> 'complete'|'recovery'|'missed'|'pending'|'off'
+  let R=0, missRun=0, prevIncomplete=false;
+  const today = upTo;
+  for (let d=q.createdAt; d<=today; d=addDays(d,1)){
+    if (!isScheduled(q,d)){ statuses[d]="off"; continue; }
+    const recoveryActive = prevIncomplete && q.recovery!==undefined;
+    const p = numP(log,d,q);
+    const full = p >= targetOf(q);
+    const rec = !full && recoveryActive && p >= q.recovery;
+    const isToday = d===today;
+    if (full || rec){
+      statuses[d] = rec ? "recovery" : "complete";
+      R += 1; missRun = 0; prevIncomplete = false;
+    } else if (isToday){
+      statuses[d] = "pending";             // today never counts as a miss yet
+    } else {
+      statuses[d] = "missed";
+      missRun += 1;
+      if (missRun >= 2) R = Math.max(0, R-(missRun-1));
+      prevIncomplete = true;
+    }
+  }
+  return { R, statuses, missRun };
+}
+
+/* Weekly-gate quest (e.g. workout 5×/week). Sessions logged per day.
+   Automaticity runs on WEEK units scaled ×7 (66 reps ≈ ~9.5 weeks). */
+function scanWeekly(q, log, upTo){
+  const start = weekStart(q.createdAt);
+  const thisWeek = weekStart(upTo);
+  let R=0, missRun=0;
+  const weeks = [];
+  for (let w=start; w<thisWeek; w=addDays(w,7)){
+    let s=0; for (let i=0;i<7;i++) s += numP(log,addDays(w,i),q)>0 ? 1 : 0;
+    const hit = s >= q.perWeek;
+    weeks.push({week:w, sessions:s, hit});
+    if (hit){ R += 7; missRun=0; }
+    else { missRun += 1; if (missRun>=2) R = Math.max(0, R-(missRun-1)*2); }
+  }
+  let cur=0; for (let i=0;i<7;i++){ const d=addDays(thisWeek,i); if (d<=upTo) cur += numP(log,d,q)>0?1:0; }
+  return { R, weeks, current:{week:thisWeek, sessions:cur} , missRun };
+}
+
+function questState(q, log, today){
+  if (q.schedule.kind==="weekly"){
+    const s = scanWeekly(q,log,today);
+    return { kind:"weekly", A:automaticity(s.R), scan:s };
+  }
+  const s = scanDaily(q,log,today);
+  const recoveryActive = (()=> {
+    let d = addDays(today,-1);
+    while (d>=q.createdAt && !isScheduled(q,d)) d = addDays(d,-1);
+    return d>=q.createdAt && s.statuses[d]==="missed" && q.recovery!==undefined;
+  })();
+  return { kind:"daily", A:automaticity(s.R), scan:s, recoveryActive };
+}
+
+/* Vitality Score for one day: weighted, partial credit, renormalized
+   across the quests active/scheduled that day. */
+function vitality(quests, log, dateStr){
+  let wSum=0, credit=0;
+  for (const q of quests){
+    if (q.archived || q.createdAt>dateStr) continue;
+    if (q.schedule.kind==="weekly"){
+      const w = weekStart(dateStr);
+      let s=0; for(let i=0;i<7;i++){ const d=addDays(w,i); if(d<=dateStr) s += numP(log,d,q)>0?1:0; }
+      const expected = q.perWeek * (weekday(dateStr)+1)/7;
+      wSum += q.weight; credit += q.weight * Math.min(1, expected>0 ? s/expected : 1);
+    } else if (isScheduled(q,dateStr)){
+      wSum += q.weight; credit += q.weight * Math.min(1, numP(log,dateStr,q)/targetOf(q));
+    }
+  }
+  return wSum>0 ? Math.round(100*credit/wSum) : 0;
+}
+
+/* Impact ledger: cumulative real quantities + real-equivalence milestones */
+function ledgerTotal(q, log){
+  let t=0;
+  for (const d in log){ if (d>=q.createdAt){ const v=numP(log,d,q); t += q.type==="binary" ? (v>=1?1:0) : q.type==="checklist" ? (v>=q.items.length?1:0) : v; } }
+  return t;
+}
+const MILESTONES = {
+  steps: { conv:t=>t*0.00074, unit:"km", label:"walked",
+    marks:[[50,"50 km on foot"],[100,"100 km — a Kathmandu Valley rim trail"],[200,"200 km — Kathmandu to Pokhara"],[500,"500 km walked"],[885,"885 km — the length of Nepal, east to west"],[2000,"2,000 km on foot"]]},
+  water: { conv:t=>t, unit:"L", label:"drunk",
+    marks:[[50,"50 litres logged"],[100,"100 litres"],[500,"500 litres"],[1000,"1,000 litres — a cubic metre of water"]]},
+  reading:{ conv:t=>t, unit:"pages", label:"read",
+    marks:[[280,"1 book finished (≈280 pages)"],[1400,"5 books"],[3360,"12 books — a book a month pace"],[7000,"25 books"],[14000,"50 books"]]},
+  meditation:{ conv:t=>t*10/60, unit:"h", label:"meditated",
+    marks:[[10,"10 hours of practice"],[19,"~8-week study threshold reached"],[50,"50 hours"],[100,"100 hours"],[250,"250 hours"]]},
+  clean:{ conv:t=>t, unit:"days", label:"clean",
+    marks:[[7,"7 clean days"],[30,"30 clean days"],[66,"66 clean days — the habit median"],[100,"100 clean days"],[365,"a clean year"]]},
+  workout:{ conv:t=>t, unit:"sessions", label:"trained",
+    marks:[[10,"10 sessions"],[50,"50 sessions"],[100,"100 sessions"],[250,"250 sessions"]]},
+  wake:{ conv:t=>t, unit:"mornings", label:"won",
+    marks:[[7,"7 mornings"],[30,"30 mornings"],[66,"66 mornings — the habit median"],[100,"100 mornings"],[365,"a year of 6 AMs"]]},
+  bed:{ conv:t=>t, unit:"nights", label:"on schedule",
+    marks:[[7,"7 nights on schedule"],[30,"30 nights"],[66,"66 nights"],[100,"100 nights"],[365,"a regular year"]]},
+  supplements:{ conv:t=>t, unit:"days", label:"covered",
+    marks:[[30,"30 days covered"],[100,"100 days"],[365,"a covered year"]]},
+};
+function ledgerFor(q, log){
+  const m = MILESTONES[q.ledger]; if(!m) return null;
+  const raw = ledgerTotal(q,log);
+  const val = m.conv(raw);
+  const next = m.marks.find(([v])=>val<v);
+  const hit  = m.marks.filter(([v])=>val>=v);
+  return { val, unit:m.unit, label:m.label, next, hit, marks:m.marks };
+}
+
+/* ================================================================
+   EVIDENCE — the studies behind the numbers. Associations, not promises.
+================================================================ */
+const EVIDENCE = [
+  { id:"steps", title:"Why 10,000 steps", src:"Paluch et al., 2022 · Lancet Public Health (meta-analysis, ~47,000 adults)",
+    body:"Pooled cohort data found all-cause mortality risk falls steeply as daily steps rise, with most of the observed benefit reached around 8,000 to 10,000 steps per day for adults under 60. Your 10K target sits at the top of that range." },
+  { id:"habit", title:"Why automaticity, not points", src:"Lally et al., 2010 · European Journal of Social Psychology (UCL)",
+    body:"Participants repeating a daily behavior showed habit strength rising along an asymptotic curve, plateauing after a median of about 66 days (range 18 to 254). Missing a single day barely affected the curve. Ace models your per-habit percentage on exactly this curve, which is why one miss costs you almost nothing and consecutive misses cost real progress." },
+  { id:"who", title:"Why 6 training days a week", src:"WHO physical activity guidelines, 2020",
+    body:"The guideline for adults is 150 to 300 minutes of moderate activity per week (or 75 to 150 vigorous). Training every day except Saturday clears that range for most styles, and the fixed Saturday rest protects recovery without breaking the schedule habit." },
+  { id:"sleep", title:"Why fixed bed and wake times", src:"Windred et al., 2023 · Sleep (UK Biobank cohort)",
+    body:"Sleep regularity, meaning consistent timing day to day, predicted mortality risk in cohort data even more strongly than sleep duration. Ace scores your consistency against your fixed 22:00 and 06:00 anchors rather than counting hours." },
+  { id:"sugar", title:"Why clean eating is tracked daily", src:"WHO guideline on free sugars, 2015",
+    body:"WHO recommends keeping free sugars under 10% of energy intake, and suggests under 5% (roughly 25 g per day) for additional benefit. A daily yes/no is a blunt but honest proxy for staying under it." },
+  { id:"medi", title:"Why 20 minutes of meditation", src:"8-week mindfulness program literature (MBSR-style trials)",
+    body:"Most trials showing measurable changes in attention and stress markers used roughly 8 weeks of regular practice. At 20 minutes a day you cross that cumulative threshold in about 8 weeks; the Archive tracks your total hours against it." },
+  { id:"nmt", title:"The one rule: never miss twice", src:"Lally et al., 2010 + habit-formation literature",
+    body:"Because single omissions barely dented the automaticity curve, the protective move after a miss is immediate resumption, not compensation. That is why a missed day issues a Recovery Protocol at the minimum viable size instead of a punishment at 150%." },
+];
+
+/* ================================================================
+   DEFAULT QUESTS
+================================================================ */
+const TODAY0 = ld();
+const DEFAULT_QUESTS = [
+  { id:"steps", name:"Steps", sysName:"DAILY MARCH", type:"quantity", target:10000, step:1000, unit:"steps",
+    recovery:6000, cat:"Movement", weight:15, schedule:{kind:"daily"}, ledger:"steps", createdAt:TODAY0, archived:false },
+  { id:"workout", name:"Workout", sysName:"TRAINING GATE", type:"binary", unit:"session",
+    recovery:1, cat:"Movement", weight:10, schedule:{kind:"days",days:[0,1,2,3,4,5]}, ledger:"workout", createdAt:TODAY0, archived:false },
+  { id:"clean", name:"Clean eating", sysName:"NO SUGAR · NO JUNK", type:"binary", unit:"day",
+    recovery:1, cat:"Nutrition", weight:12, schedule:{kind:"daily"}, ledger:"clean", createdAt:TODAY0, archived:false },
+  { id:"supplements", name:"Supplements", sysName:"FUEL PROTOCOL", type:"checklist", items:["Protein","Creatine","Magnesium","Fish oil"],
+    cat:"Nutrition", weight:8, schedule:{kind:"daily"}, ledger:"supplements", createdAt:TODAY0, archived:false },
+  { id:"water", name:"Water", sysName:"HYDRATION", type:"quantity", target:3, step:0.5, unit:"L",
+    recovery:2, cat:"Hydration", weight:10, schedule:{kind:"daily"}, ledger:"water", createdAt:TODAY0, archived:false },
+  { id:"bed", name:"In bed 22:00 · asleep 22:30", sysName:"SHUTDOWN", type:"binary", unit:"night",
+    recovery:1, cat:"Sleep", weight:12.5, schedule:{kind:"daily"}, ledger:"bed", checkin:"lastNight", createdAt:TODAY0, archived:false },
+  { id:"wake", name:"Wake 06:00", sysName:"FIRST LIGHT", type:"binary", unit:"morning",
+    recovery:1, cat:"Sleep", weight:12.5, schedule:{kind:"daily"}, ledger:"wake", checkin:"today", createdAt:TODAY0, archived:false },
+  { id:"meditation", name:"Meditation", sysName:"STILL MIND", type:"sessions", target:2, unit:"× 10 min",
+    recovery:1, cat:"Mind", weight:12, schedule:{kind:"daily"}, ledger:"meditation", createdAt:TODAY0, archived:false },
+  { id:"reading", name:"Reading", sysName:"PAGES", type:"quantity", target:15, step:1, unit:"pages",
+    recovery:5, cat:"Mind", weight:8, schedule:{kind:"daily"}, ledger:"reading", createdAt:TODAY0, archived:false },
+];
+
+/* ================================================================
+   STORE — versioned, migratable, localStorage
+================================================================ */
+const SKEY = "arise-v1";
+const EMPTY_STORE = { v:3, quests:DEFAULT_QUESTS, log:{}, checkins:{}, seen:{}, journal:{} };
+function migrate(s){
+  if (!s || typeof s!=="object") return {...EMPTY_STORE};
+  if (!s.v) s.v = 1;
+  if (s.v===1){
+    s.quests = (s.quests||DEFAULT_QUESTS).map(q=>{
+      if (q.id==="supplements") return {...q, items:["Protein","Creatine","Magnesium","Fish oil"]};
+      if (q.id==="steps") return {...q, step:1000};
+      if (q.id==="water") return {...q, step:0.5};
+      return q;
+    });
+    s.v = 2;
+  }
+  if (s.v===2){
+    /* Workout becomes a daily quest, 6 days a week — only Saturday exempt.
+       Old per-day session logs (0/1) map cleanly onto the binary type. */
+    s.quests = (s.quests||DEFAULT_QUESTS).map(q=> q.id==="workout"
+      ? {...q, type:"binary", unit:"session", recovery:q.recovery??1, perWeek:undefined, schedule:{kind:"days",days:[0,1,2,3,4,5]}}
+      : q);
+    s.v = 3;
+  }
+  return { ...EMPTY_STORE, ...s };
+}
+const loadStore = () => { try { return migrate(JSON.parse(localStorage.getItem(SKEY))); } catch(e){ return {...EMPTY_STORE}; } };
+const saveStore = s => { try { localStorage.setItem(SKEY, JSON.stringify(s)); } catch(e){ console.error("save failed",e); } };
+
+/* ================================================================
+   SMALL UI ATOMS
+================================================================ */
+const REDUCE_MOTION = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const I = {
+  steps:"M4 16v-2.38C4 11.5 6.5 9 9.62 9c1.5 0 2.88.58 3.88 1.62L16 13m-6 3h.01M8 20h8M12 4h.01",
+  water:"M12 2.7c3.5 4.2 6 7.6 6 10.8a6 6 0 1 1-12 0c0-3.2 2.5-6.6 6-10.8Z",
+  moon:"M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z",
+  sun:"M12 3v2M12 19v2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M3 12h2M19 12h2M5.6 18.4 7 17M17 7l1.4-1.4M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z",
+  gym:"M6.5 6.5 17.5 17.5M4 7l3-3M17 20l3-3M3 10l7-7M14 21l7-7",
+  leaf:"M11 20A7 7 0 0 1 4 13c0-5 4-9 10-10 1 6-1 10-3 12m0 0c-1.5 1.5-3.5 2-3.5 2S9 15.5 11 15",
+  pill:"M10.5 20.5a5 5 0 0 1-7-7l7-7a5 5 0 0 1 7 7ZM7 10l7 7",
+  book:"M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22H20",
+  brain:"M12 4.5a3 3 0 0 0-5.8 1A3 3 0 0 0 4 8.5 3 3 0 0 0 5.5 14 3 3 0 0 0 9 19h3m0-14.5V19m0-14.5a3 3 0 0 1 5.8 1A3 3 0 0 1 20 8.5 3 3 0 0 1 18.5 14 3 3 0 0 1 15 19h-3",
+  home:"M3 10.5 12 3l9 7.5M5 9.5V21h5v-6h4v6h5V9.5",
+  pen:"M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z",
+  trend:"M3 17l6-6 4 4 8-8M21 7v5h-5",
+  arch:"M4 19V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v13M4 19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2M9 8h6",
+  gear:"M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm8.5 4a8.5 8.5 0 0 1-.1 1.3l2 1.5-2 3.4-2.3-.9a8.6 8.6 0 0 1-2.2 1.3l-.4 2.4h-4l-.4-2.4a8.6 8.6 0 0 1-2.2-1.3l-2.3.9-2-3.4 2-1.5a8.6 8.6 0 0 1 0-2.6l-2-1.5 2-3.4 2.3.9A8.6 8.6 0 0 1 8.6 5l.4-2.4h4l.4 2.4a8.6 8.6 0 0 1 2.2 1.3l2.3-.9 2 3.4-2 1.5c.07.42.1.86.1 1.3Z",
+  board:"M4 5h16M4 12h16M4 19h10",
+  bell:"M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0",
+  bolt:"M13 2 4.5 13.5H11L10 22l8.5-11.5H12L13 2Z",
+  heart:"M19.5 12.6 12 20l-7.5-7.4A5 5 0 1 1 12 6.3a5 5 0 1 1 7.5 6.3Z",
+  spark:"M12 3l1.9 5.6L19.5 10 13.9 11.9 12 17.5 10.1 11.9 4.5 10l5.6-1.4L12 3Z",
+  cal:"M8 2v4M16 2v4M3 9h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z",
+};
+const Icon = ({k,size=18,c="currentColor",sw=2}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"><path d={I[k]||I.board}/></svg>;
+const QICON = { steps:"steps", workout:"gym", clean:"leaf", supplements:"pill", water:"water", bed:"moon", wake:"sun", meditation:"brain", reading:"book" };
+const CATICON = { Sleep:"moon", Movement:"gym", Mind:"brain", Nutrition:"leaf", Hydration:"water" };
+const iconOf = q => QICON[q.id] || CATICON[q.cat] || "board";
+const CATC = { Sleep:"#7A7BEA", Movement:"#FF8A5C", Mind:"#2FC4C3", Nutrition:"#54BB74", Hydration:"#4D9FFF" };
+const colorOf = q => CATC[q.cat] || "#7A7BEA";
+const tint = (hex,a=0.13) => hex + Math.round(a*255).toString(16).padStart(2,"0");
+
+const Chevron = ({dir="right",size=15}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{transform:dir==="left"?"rotate(180deg)":dir==="up"?"rotate(-90deg)":dir==="down"?"rotate(90deg)":"none",flexShrink:0}}><path d="m9 18 6-6-6-6"/></svg>;
+const Check = ({size=15,c="#fff"}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
+
+/* Rank crest — a faceted gem badge, one gradient per rank tier (E → SSS) */
+const RANKC = {
+  E:  ["#ADB3C2","#6E7686"], D:["#7FE0AE","#1FA06B"], C:["#63DDD2","#0E9C9C"],
+  B:  ["#7CC3FF","#3B76F6"], A:["#B49BFA","#7A54EA"], S:["#FFD98A","#F0A020"],
+  SS: ["#FFB37E","#F4597B"], SSS:["#F2A9FF","#7C5CEA"],
+};
+function RankBadge({rank,size=50,onClick}){
+  const [c1,c2] = RANKC[rank]||RANKC.E;
+  const id = "rb"+rank;
+  const fs = rank.length>2?11.5:rank.length>1?14:18;
+  return (
+    <button onClick={onClick} aria-label={`Rank ${rank} — open progress`}
+      style={{width:size,height:size*1.1,flexShrink:0,padding:0,filter:`drop-shadow(0 7px 14px ${c2}66)`}}>
+      <svg viewBox="0 0 48 54" width="100%" height="100%" style={{display:"block"}}>
+        <defs>
+          <linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor={c1}/><stop offset="100%" stopColor={c2}/>
+          </linearGradient>
+        </defs>
+        <path d="M24 1.5 44.5 11.5 V33 L24 52.5 3.5 33 V11.5 Z" fill={`url(#${id})`} stroke="rgba(255,255,255,.9)" strokeWidth="2.2" strokeLinejoin="round"/>
+        <path d="M24 3.5 42.5 12.5 24 21 5.5 12.5 Z" fill="rgba(255,255,255,.26)"/>
+        <path d="M24 52.5 3.5 33 V26 L24 45 44.5 26 V33 Z" fill="rgba(24,20,60,.14)"/>
+        {rank==="SSS" && <><circle cx="9.5" cy="9" r="1.6" fill="#fff" opacity=".9"/><circle cx="40" cy="21" r="1.2" fill="#fff" opacity=".8"/></>}
+        <text x="24" y={fs>15?30:29.5} textAnchor="middle" fontFamily="Sora,'Plus Jakarta Sans',sans-serif" fontWeight="800" fontSize={fs} fill="#fff" style={{paintOrder:"stroke"}} stroke="rgba(24,20,60,.16)" strokeWidth=".6">{rank}</text>
+        <text x="24" y="40.5" textAnchor="middle" fontFamily="'Plus Jakarta Sans',sans-serif" fontWeight="800" fontSize="5.6" letterSpacing="1.6" fill="rgba(255,255,255,.92)">RANK</text>
+      </svg>
+    </button>
+  );
+}
+
+/* Pastel icon tile — white/soft-tinted rounded square with a colored outline icon */
+const Sq = ({k,c,size=44,isz=20}) => (
+  <span style={{width:size,height:size,borderRadius:size*0.34,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",
+    background:`linear-gradient(160deg,${tint(c,0.22)},${tint(c,0.08)})`,border:`1px solid ${tint(c,0.26)}`,
+    boxShadow:`inset 0 1px 0 rgba(255,255,255,.85), 0 4px 10px ${tint(c,0.16)}`}}>
+    <Icon k={k} size={isz} c={c} sw={2}/>
+  </span>
+);
+
+function Notice({title,children,onClose,tone,titleColor}){
+  return (
+    <div className={"notice "+(tone==="decay"?"notice-decay":"notice-brand")}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+        <span style={{width:8,height:8,borderRadius:"50%",background:tone==="decay"?"var(--decay)":"var(--primary)",boxShadow:`0 0 0 4px ${tone==="decay"?"rgba(240,100,124,.14)":"rgba(122,123,234,.16)"}`}}/>
+        <span style={{fontSize:".6875rem",fontWeight:800,letterSpacing:".09em",textTransform:"uppercase",color:titleColor||(tone==="decay"?"var(--decay)":"var(--primary)")}}>{title}</span>
+        {onClose && <button onClick={onClose} aria-label="Dismiss" style={{marginLeft:"auto",color:"var(--muted)",fontSize:"1.15rem",lineHeight:1,padding:"0 4px"}}>×</button>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+/* Gradient progress ring (small circular gauges) */
+function Ring({score,size=76,stroke=6,color,color2,idSuffix,children}){
+  const r=(size-stroke-2)/2, ci=2*Math.PI*r;
+  const gid = "rg"+(idSuffix||"v");
+  return (
+    <div style={{position:"relative",width:size,height:size,flexShrink:0}}>
+      <svg width={size} height={size}>
+        <defs><linearGradient id={gid} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor={color||"#7A7BEA"}/><stop offset="100%" stopColor={color2||color||"#9F8FF4"}/>
+        </linearGradient></defs>
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="var(--track)" strokeWidth={stroke}/>
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={`url(#${gid})`} strokeWidth={stroke} strokeLinecap="round"
+          strokeDasharray={ci} strokeDashoffset={ci*(1-Math.min(score,100)/100)} transform={`rotate(-90 ${size/2} ${size/2})`}
+          style={{transition:"stroke-dashoffset .7s cubic-bezier(.22,1,.36,1)"}}/>
+      </svg>
+      <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>{children}</div>
+    </div>
+  );
+}
+
+/* ================================================================
+   SIGNATURE — the liquid vitality gauge.
+   A circular vessel that literally fills with today's vitality,
+   with two drifting waves and a progress arc riding the rim.
+================================================================ */
+function WaveGauge({pct=0,size=200,children}){
+  const p = Math.min(100,Math.max(0,pct));
+  const stroke = 7, gap = 12;
+  const R = (size - stroke)/2;
+  const inner = size/2 - stroke - gap;
+  const cx = size/2, cy = size/2;
+  const C = 2*Math.PI*R;
+  const ang = (p/100)*2*Math.PI - Math.PI/2;
+  const mx = cx + R*Math.cos(ang), my = cy + R*Math.sin(ang);
+  const D = inner*2;
+  const level = (cy - inner) + (1 - p/100)*D;
+  const amp = Math.max(3.5, D*0.035);
+  const L = D;                                  // wavelength = inner diameter
+  const x0 = cx - inner - L;
+  const wavePath = (a, flip) => {
+    let d = `M ${x0} ${level}`;
+    for (let i=0;i<6;i++){ const dir = (i%2===0) !== !!flip ? -1 : 1; d += ` q ${L/4} ${dir*a*2} ${L/2} 0`; }
+    d += ` V ${size+8} H ${x0} Z`;
+    return d;
+  };
+  const uid = "wg"+size;
+  return (
+    <div style={{position:"relative",width:size,height:size,flexShrink:0}}>
+      <svg width={size} height={size} style={{display:"block",filter:"drop-shadow(0 10px 22px rgba(92,94,224,.20))"}}>
+        <defs>
+          <clipPath id={uid+"c"}><circle cx={cx} cy={cy} r={inner}/></clipPath>
+          <linearGradient id={uid+"g"} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="var(--primary)"/><stop offset="100%" stopColor="var(--primary2)"/>
+          </linearGradient>
+          <linearGradient id={uid+"w"} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#8D8AF0"/><stop offset="100%" stopColor="#7A7BEA"/>
+          </linearGradient>
+        </defs>
+        {/* rim track + progress arc */}
+        <circle cx={cx} cy={cy} r={R} fill="none" stroke="var(--track)" strokeWidth={stroke}/>
+        <circle cx={cx} cy={cy} r={R} fill="none" stroke={`url(#${uid}g)`} strokeWidth={stroke} strokeLinecap="round"
+          strokeDasharray={C} strokeDashoffset={C*(1-p/100)} transform={`rotate(-90 ${cx} ${cy})`}
+          style={{transition:"stroke-dashoffset .8s cubic-bezier(.22,1,.36,1)"}}/>
+        <circle cx={mx} cy={my} r={stroke*0.95} fill="#fff" stroke="var(--primary)" strokeWidth="3"
+          style={{transition:"cx .8s cubic-bezier(.22,1,.36,1), cy .8s cubic-bezier(.22,1,.36,1)"}}/>
+        {/* vessel */}
+        <circle cx={cx} cy={cy} r={inner} fill="#F4F3FD"/>
+        <g clipPath={`url(#${uid}c)`}>
+          <path d={wavePath(amp*0.9, true)} fill="var(--primary2)" opacity="0.4">
+            {!REDUCE_MOTION && <animateTransform attributeName="transform" type="translate" from="0 0" to={`${L} 0`} dur="7s" repeatCount="indefinite"/>}
+          </path>
+          <path d={wavePath(amp, false)} fill={`url(#${uid}w)`}>
+            {!REDUCE_MOTION && <animateTransform attributeName="transform" type="translate" from="0 0" to={`${-L} 0`} dur="5s" repeatCount="indefinite"/>}
+          </path>
+        </g>
+        <ellipse cx={cx-inner*0.32} cy={cy-inner*0.46} rx={inner*0.5} ry={inner*0.26} fill="rgba(255,255,255,.30)" transform={`rotate(-24 ${cx-inner*0.32} ${cy-inner*0.46})`}/>
+        <circle cx={cx} cy={cy} r={inner} fill="none" stroke="rgba(122,123,234,.16)" strokeWidth="1"/>
+      </svg>
+      <div style={{position:"absolute",inset:stroke+gap,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",borderRadius:"50%",pointerEvents:"none",
+        color:p>=58?"#fff":"var(--ink)",textShadow:p>=58?"0 1px 8px rgba(72,70,160,.35)":"none",transition:"color .4s"}}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/* ================================================================
+   30-DAY TRACKING — micro-dots + per-quest detail sheet
+================================================================ */
+const DOTC = { complete:"#34B97B", recovery:"#8FDDB6", missed:"#F5C0CD", pending:"#C9C8F5", off:"rgba(36,34,60,0.08)", none:"rgba(36,34,60,0.04)" };
+function dayStatus(q,state,log,d,today){
+  if (d>today || d<q.createdAt) return "none";
+  if (q.schedule.kind==="weekly") return numP(log,d,q)>0 ? "complete" : (d===today?"pending":"missed");
+  return state.scan.statuses[d] || "none";
+}
+function Dots30({q,state,log,today,size=5}){
+  /* Fills left → right: day 1 sits at the far left. Once the quest is
+     30+ days old this becomes a rolling window ending today. */
+  const start = daysBetween(q.createdAt,today) >= 29 ? addDays(today,-29) : q.createdAt;
+  const days = Array.from({length:30},(_,i)=>addDays(start,i));
+  return (
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",width:"100%"}}>
+      {days.map(d=><span key={d} title={d} style={{width:size,height:size,borderRadius:"50%",background:DOTC[dayStatus(q,state,log,d,today)],flexShrink:0}}/>)}
+    </div>
+  );
+}
+function DotLegend({items,size=7}){
+  return (
+    <div style={{display:"flex",flexWrap:"wrap",gap:"5px 14px",fontSize:".625rem",fontWeight:600,color:"var(--muted)"}}>
+      {items.map(([k,l])=>(<span key={k} style={{display:"inline-flex",alignItems:"center",gap:5}}><span style={{width:size,height:size,borderRadius:"50%",background:DOTC[k]}}/>{l}</span>))}
+    </div>
+  );
+}
+function QuestDetail({q, state, log, today, onClose}){
+  const c = colorOf(q);
+  const start = daysBetween(q.createdAt,today) >= 29 ? addDays(today,-29) : q.createdAt;
+  const days = Array.from({length:30},(_,i)=>addDays(start,i));
+  const sts = days.map(d=>dayStatus(q,state,log,d,today));
+  const schedN = sts.filter(s=>s!=="off"&&s!=="none").length;
+  const doneN = sts.filter(s=>s==="complete"||s==="recovery").length;
+  const L = ledgerFor(q,log);
+  const A = state.A;
+  const fmtV = v => L && (L.unit==="km"||L.unit==="h") ? v.toFixed(1) : Math.round(v).toLocaleString();
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:100,background:"rgba(36,34,60,0.4)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",display:"flex",alignItems:"flex-end",justifyContent:"center"}} onClick={onClose}>
+      <div style={{width:"100%",maxWidth:520,background:"var(--card)",borderRadius:"32px 32px 0 0",maxHeight:"86vh",overflowY:"auto",boxShadow:"0 -10px 44px rgba(36,34,60,0.2)",animation:"rise .3s cubic-bezier(.22,1,.36,1)"}} onClick={e=>e.stopPropagation()}>
+        <div style={{width:44,height:5,borderRadius:99,background:"var(--track)",margin:"12px auto 0"}}/>
+        <div style={{display:"flex",alignItems:"center",gap:12,padding:"14px 20px 16px",borderBottom:"1px solid var(--line)"}}>
+          <Sq k={iconOf(q)} c={c} size={42} isz={19}/>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:"1.0625rem",fontWeight:800,letterSpacing:"-0.01em"}}>{q.name}</div>
+            <div style={{fontSize:".6875rem",fontWeight:600,color:"var(--muted)",marginTop:2}}>automaticity {A.toFixed(0)}% · {stageOf(A).toLowerCase()}</div>
+          </div>
+          <button onClick={onClose} aria-label="Close" style={{color:"var(--muted)",fontSize:"1.2rem",padding:"2px 6px"}}>×</button>
+        </div>
+        <div style={{padding:"18px 20px 28px"}}>
+          <div style={{display:"flex",gap:9,marginBottom:18}}>
+            <div style={{flex:1,background:"var(--card2)",borderRadius:18,padding:"12px 13px"}}>
+              <div className="num" style={{fontSize:"1.0625rem",fontWeight:800,color:"#34B97B"}}>{doneN}<span style={{fontSize:".6875rem",color:"var(--faint)",fontWeight:700}}>/{schedN}</span></div>
+              <div style={{fontSize:".625rem",fontWeight:600,color:"var(--muted)",marginTop:2}}>days done · 30d</div>
+            </div>
+            <div style={{flex:1,background:"var(--card2)",borderRadius:18,padding:"12px 13px"}}>
+              <div className="num" style={{fontSize:"1.0625rem",fontWeight:800,color:c}}>{A.toFixed(1)}%</div>
+              <div style={{fontSize:".625rem",fontWeight:600,color:"var(--muted)",marginTop:2}}>automaticity</div>
+            </div>
+            {L && <div style={{flex:1,background:"var(--card2)",borderRadius:18,padding:"12px 13px"}}>
+              <div className="num" style={{fontSize:"1.0625rem",fontWeight:800}}>{fmtV(L.val)}<span style={{fontSize:".625rem",color:"var(--faint)",fontWeight:700}}> {L.unit}</span></div>
+              <div style={{fontSize:".625rem",fontWeight:600,color:"var(--muted)",marginTop:2}}>{L.label} · total</div>
+            </div>}
+          </div>
+          <div className="eyebrow" style={{marginBottom:10}}>Last 30 days</div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:7,marginBottom:8}}>
+            {days.map((d,i)=><span key={d} title={d+" · "+sts[i]} style={{width:10,height:10,borderRadius:"50%",background:DOTC[sts[i]]}}/>)}
+          </div>
+          <div style={{display:"flex",justifyContent:"space-between",fontSize:".625rem",fontWeight:600,color:"var(--faint)",marginBottom:14}}>
+            <span>{fmtDay(days[0])}</span><span>{days[29]>today ? fmtDay(days[29]) : "today"}</span>
+          </div>
+          <div style={{marginBottom:L&&L.next?16:0}}>
+            <DotLegend items={[["complete","done"],["recovery","recovery"],["missed","missed"],["pending","today"],["off","rest day"]]}/>
+          </div>
+          {L && L.next && <div style={{background:"var(--prim-soft)",borderRadius:16,padding:"11px 14px",fontSize:".75rem",fontWeight:600,color:"var(--deep)"}}>Next milestone: {L.next[1]}</div>}
+          <div style={{fontSize:".625rem",fontWeight:500,color:"var(--faint)",marginTop:14}}>Tap the pencil below to log today. To edit this quest, tap its name in the Quest Log.</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function QuestTile({q, state, log, today, onOpen}){
+  const c = colorOf(q);
+  const isWeekly = q.schedule.kind==="weekly";
+  const rest = !isWeekly && !isScheduled(q,today);
+  const p = isWeekly ? state.scan.current.sessions : numP(log,today,q);
+  const tgt = isWeekly ? q.perWeek : targetOf(q);
+  const pct = rest ? 0 : Math.min(100, 100*p/tgt);
+  const done = !rest && pct>=100;
+  const fmtK = v => v>=10000 ? Math.round(v/1000)+"k" : v>=1000 ? (v/1000).toFixed(1).replace(/\.0$/,"")+"k" : (q.step&&q.step<1 ? (+v).toFixed(1).replace(/\.0$/,"") : Math.round(v).toLocaleString());
+  const value = rest ? "Rest" : q.type==="binary" ? (p>=1?"Done":"—") : (q.type==="checklist"||isWeekly) ? `${p}/${tgt}` : `${fmtK(p)}/${fmtK(tgt)}`;
+  return (
+    <button className="tile" onClick={()=>onOpen(q)} style={rest?{opacity:.55}:undefined} aria-label={`${q.name} — 30-day detail`}>
+      {done && <span style={{position:"absolute",top:6,right:6,width:17,height:17,borderRadius:"50%",background:c,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 3px 8px ${tint(c,0.4)}`}}><Check size={9}/></span>}
+      <Sq k={iconOf(q)} c={c} size={42} isz={19}/>
+      <div style={{fontSize:".6875rem",fontWeight:700,marginTop:8,lineHeight:1.2,width:"100%",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{q.id==="bed"?"Sleep 22:30":q.name}</div>
+      <div className="num" style={{fontSize:".75rem",fontWeight:700,margin:"3px 0 8px",color:done?c:rest?"var(--faint)":"var(--ink)"}}>{value}</div>
+      <div className="bar" style={{height:4,width:"100%"}}><i style={{width:pct+"%",background:done?c:`linear-gradient(90deg,${c},${c}CC)`}}/></div>
+    </button>
+  );
+}
+
+function WeekBars({quests, log, today}){
+  const active = quests.filter(q=>!q.archived);
+  const week = Array.from({length:7},(_,i)=>{const d=addDays(today,-(6-i)); return {d, v:vitality(active,log,d)};});
+  const avg7 = Math.round(week.reduce((s,x)=>s+x.v,0)/7);
+  return (
+    <div className="card" style={{padding:"18px 20px",borderRadius:"var(--r-xl)"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+        <div>
+          <div style={{fontSize:".9375rem",fontWeight:800}}>Vitality</div>
+          <div style={{fontSize:".6875rem",fontWeight:600,color:"var(--muted)",marginTop:2}}><span className="num" style={{fontWeight:800,color:"var(--primary)"}}>{avg7}%</span> average</div>
+        </div>
+        <span className="pill">This week</span>
+      </div>
+      <div style={{display:"flex",gap:10,alignItems:"flex-end",height:96}}>
+        {week.map((x,i)=>(
+          <div key={x.d} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:7,height:"100%"}}>
+            <div style={{flex:1,width:"100%",maxWidth:26,margin:"0 auto",borderRadius:99,background:"var(--track)",position:"relative",overflow:"hidden"}}>
+              <div style={{position:"absolute",bottom:0,left:0,right:0,height:Math.max(6,x.v)+"%",borderRadius:99,
+                background:i===6?"linear-gradient(180deg,var(--primary2),var(--primary))":"#CFCEF3",transition:"height .5s cubic-bezier(.22,1,.36,1)",
+                boxShadow:i===6?"0 4px 12px var(--prim-glow)":"none"}}/>
+            </div>
+            <span style={{fontSize:".625rem",fontWeight:700,color:i===6?"var(--primary)":"var(--faint)"}}>{parseLd(x.d).toLocaleDateString("en",{weekday:"narrow"})}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Dashboard({quests, states, log, today, vToday, onGoLog, onOpen, notices}){
+  const active = quests.filter(q=>!q.archived);
+  const order = ["steps","workout","water","meditation","reading","clean","supplements","wake","bed"];
+  const sorted = [...active].sort((a,b)=>{
+    const ia=order.indexOf(a.id), ib=order.indexOf(b.id);
+    return (ia<0?99:ia)-(ib<0?99:ib);
+  });
+  const schedToday = q => q.schedule.kind==="weekly" || isScheduled(q,today);
+  const isDone = q => q.schedule.kind==="weekly" ? numP(log,today,q)>0 : numP(log,today,q)>=targetOf(q);
+  const todayQ = sorted.filter(schedToday);
+  const cleared = todayQ.filter(isDone).length;
+  const next = todayQ.find(q=>!isDone(q));
+  const nc = next ? colorOf(next) : "var(--primary)";
+  const fmt = (q,v) => q.step && q.step<1 ? (+v).toFixed(1).replace(/\.0$/,"") : Math.round(v).toLocaleString();
+  const remainTxt = next ? (()=>{
+    if (next.schedule.kind==="weekly") return `${Math.max(0,next.perWeek-states[next.id].scan.current.sessions)} sessions left this week`;
+    if (next.type==="binary") return next.checkin==="lastNight" ? "confirm last night" : "mark it done";
+    if (next.type==="checklist") return `${Math.max(0,targetOf(next)-numP(log,today,next))} of ${targetOf(next)} left`;
+    return `${fmt(next, Math.max(0,targetOf(next)-numP(log,today,next)))} ${next.unit||""} to go`;
+  })() : "";
+
+  return (
+    <div style={{animation:"fadeIn .25s",display:"grid",gap:12}}>
+      {/* Today's highlights — first thing on screen, all quests above the fold */}
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",margin:"0 4px"}}>
+        <span style={{fontSize:"1.0625rem",fontWeight:800,letterSpacing:"-0.01em"}}>Today's highlights</span>
+        <span style={{fontSize:".6875rem",fontWeight:700,color:"var(--muted)"}}>{cleared} of {todayQ.length} cleared</span>
+      </div>
+      <div className="grid3">
+        {sorted.map(q=><QuestTile key={q.id} q={q} state={states[q.id]} log={log} today={today} onOpen={onOpen}/>)}
+      </div>
+
+      {notices}
+
+      {/* Liquid vitality vessel + the one thing to do next */}
+      <div className="card" style={{borderRadius:"var(--r-xl)",padding:"20px 18px",position:"relative",overflow:"hidden"}}>
+        <div style={{position:"absolute",top:-70,right:-70,width:190,height:190,borderRadius:"50%",background:"radial-gradient(circle,rgba(159,143,244,.18),transparent 70%)"}}/>
+        <svg style={{position:"absolute",bottom:0,left:0,width:"100%",height:44,pointerEvents:"none"}} viewBox="0 0 400 44" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 22 Q50 6 100 22 T200 22 T300 22 T400 22 V44 H0 Z" fill="rgba(122,123,234,.08)"/>
+          <path d="M0 30 Q50 16 100 30 T200 30 T300 30 T400 30 V44 H0 Z" fill="rgba(122,123,234,.10)"/>
+        </svg>
+        <div style={{display:"flex",alignItems:"center",gap:18,position:"relative"}}>
+          <div style={{position:"relative",flexShrink:0}}>
+            <WaveGauge pct={vToday} size={150}>
+              <span className="num" style={{fontSize:"1.75rem",fontWeight:800,lineHeight:1}}>{vToday}<span style={{fontSize:".875rem",fontWeight:700}}>%</span></span>
+              <span style={{fontSize:".5rem",fontWeight:800,letterSpacing:".15em",marginTop:3,opacity:.85}}>VITALITY</span>
+            </WaveGauge>
+            <span style={{position:"absolute",right:-7,top:12}}><Icon k="spark" size={11} c="#C9C0F7"/></span>
+          </div>
+          <div style={{flex:1,minWidth:0,position:"relative"}}>
+            <div className="eyebrow" style={{marginBottom:8}}>{parseLd(today).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"long"})}</div>
+            {next ? (<React.Fragment>
+              <div style={{display:"flex",alignItems:"center",gap:9,marginBottom:4}}>
+                <Sq k={iconOf(next)} c={nc} size={30} isz={14}/>
+                <div style={{fontSize:".9375rem",fontWeight:800,letterSpacing:"-0.01em",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{next.name}</div>
+              </div>
+              <div style={{fontSize:".6875rem",fontWeight:600,color:"var(--muted)",marginBottom:13}}>{remainTxt}</div>
+              <button className="pillbtn solid" style={{padding:"11px 20px"}} onClick={onGoLog}><Icon k="pen" size={13} c="#fff"/>Log it</button>
+            </React.Fragment>) : (
+              <div>
+                <div style={{fontSize:".9375rem",fontWeight:800,color:"var(--primary)"}}>All quests cleared ✨</div>
+                <div style={{fontSize:".6875rem",fontWeight:600,color:"var(--muted)",marginTop:5,lineHeight:1.5}}>The vessel is full. See you at tomorrow's check-in.</div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <WeekBars quests={quests} log={log} today={today}/>
+    </div>
+  );
+}
+
+/* ================================================================
+   QUEST CARD (Log)
+================================================================ */
+function QuestCard({q, log, today, state, onLog, onOpenEdit, compact, onExpand}){
+  const c = colorOf(q);
+  const isWeekly = q.schedule.kind==="weekly";
+  const p = isWeekly ? state.scan.current.sessions : numP(log,today,q);
+  const tgt = isWeekly ? q.perWeek : targetOf(q);
+  const rec = !isWeekly && state.recoveryActive && p < tgt;
+  const done = isWeekly ? numP(log,today,q)>0 : p>=tgt;
+  const recDone = rec && p>=q.recovery;
+  const pct = Math.min(100, 100*p/(rec && !recDone ? q.recovery : tgt));
+  const A = state.A;
+  const fmt = v => q.step && q.step<1 ? (+v).toFixed(1).replace(/\.0$/,"") : Math.round(v).toLocaleString();
+  const primaryBtn = { background:`linear-gradient(135deg,${c},${c}D9)`, color:"#fff", boxShadow:`0 8px 18px ${tint(c,0.35)}` };
+
+  if (compact){
+    return (
+      <button onClick={onExpand} className="card" style={{width:"100%",display:"flex",alignItems:"center",gap:12,padding:"13px 15px",marginBottom:9,borderRadius:20}}>
+        <span style={{width:28,height:28,borderRadius:"50%",background:c,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:`0 4px 10px ${tint(c,0.35)}`}}><Check size={13}/></span>
+        <span style={{fontSize:".875rem",fontWeight:700,textAlign:"left",flex:1,color:"var(--muted)"}}>{q.name}</span>
+        {recDone && <span style={{fontSize:".5625rem",fontWeight:800,color:c,letterSpacing:".05em"}}>CHAIN RESTORED</span>}
+        <span className="num" style={{fontSize:".75rem",fontWeight:700,color:"var(--faint)"}}>{isWeekly ? p+"/"+tgt+" wk" : fmt(p)+(q.unit?" "+q.unit:"")}</span>
+      </button>
+    );
+  }
+
+  return (
+    <div className="card" style={{padding:"18px",marginBottom:12,borderRadius:"var(--r-xl)", borderColor: rec && !recDone ? "rgba(240,100,124,0.3)" : undefined, background: rec && !recDone ? "linear-gradient(180deg,#FEF5F8,#FFFFFF 45%)" : undefined}}>
+      <div style={{display:"flex",alignItems:"center",gap:13}}>
+        <Sq k={iconOf(q)} c={rec&&!recDone?"#F0647C":c} size={48} isz={22}/>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <button onClick={()=>onOpenEdit(q)} style={{fontSize:".9375rem",fontWeight:800,textAlign:"left",letterSpacing:"-0.01em"}}>{q.name}</button>
+            {rec && !recDone && <span style={{fontSize:".5625rem",fontWeight:800,color:"var(--decay)",letterSpacing:".06em",background:"var(--decay-soft)",padding:"3px 8px",borderRadius:99}}>RECOVERY</span>}
+          </div>
+          <div style={{fontSize:".6875rem",fontWeight:600,color:"var(--muted)",marginTop:3}}>
+            {isWeekly ? `${state.scan.current.sessions} of ${q.perWeek} this week`
+             : rec && !recDone ? `reduced target ${fmt(q.recovery)}${q.unit?" "+q.unit:""} · restart the chain`
+             : `automaticity ${A.toFixed(0)}% · ${stageOf(A).toLowerCase()}`}
+          </div>
+        </div>
+        <div className="num" style={{fontSize:"1.375rem",fontWeight:800,whiteSpace:"nowrap"}}>
+          {q.type==="checklist" ? p : fmt(p)}<span style={{fontSize:".75rem",color:"var(--faint)",fontWeight:700}}>/{rec&&!recDone ? fmt(q.recovery) : (q.type==="checklist"?tgt:fmt(tgt))}</span>
+        </div>
+      </div>
+
+      <div className="bar" style={{margin:"15px 0"}}><i style={{width:pct+"%",background:rec&&!recDone?"linear-gradient(90deg,#F0647C,#F98BA0)":`linear-gradient(90deg,${c},${c}CC)`}}/></div>
+
+      <div style={{display:"flex",gap:9,flexWrap:q.type==="checklist"?"wrap":"nowrap"}}>
+        {q.type==="quantity" && <>
+          <button className="tapbtn" style={{width:54,fontSize:"1.05rem"}} onClick={()=>onLog(q, Math.max(0, +(p - q.step).toFixed(4)))} aria-label="decrease">−</button>
+          <button className="tapbtn" style={{flex:1,...primaryBtn}} onClick={()=>onLog(q, +(p + q.step).toFixed(4))}>
+            {q.id==="water" ? "+500 ml" : `+${fmt(q.step)}${q.unit?" "+q.unit:""}`}
+          </button>
+          {q.id==="reading" && <button className="tapbtn" style={{width:62}} onClick={()=>onLog(q, p+5)}>+5</button>}
+          {q.id==="steps" && <button className="tapbtn" style={{width:70,fontSize:".8125rem"}} onClick={()=>{ const v=prompt("Today's step count (phone or Fitbit):", p||""); if(v!==null&&v!=="") onLog(q, Math.max(0,parseInt(v.replace(/[^0-9]/g,""))||0)); }}>enter</button>}
+        </>}
+        {q.type==="sessions" && Array.from({length:tgt},(_,i)=>(
+          <button key={i} className="tapbtn" style={{flex:1,gap:7,...(p>i?primaryBtn:{})}} onClick={()=>onLog(q, p>i ? i : i+1)}>
+            {p>i ? <><Check size={13}/><span style={{fontSize:".8125rem"}}>10 min</span></> : <span style={{fontSize:".8125rem",color:"var(--muted)"}}>session {i+1}</span>}
+          </button>
+        ))}
+        {q.type==="binary" && (
+          <button className="tapbtn" style={{flex:1,gap:8,...(p>=1?primaryBtn:{})}} onClick={()=>onLog(q, p>=1?0:1)}>
+            {p>=1 ? <><Check size={14}/><span>{q.id==="workout"?"Trained today":"Done"}</span></> : <span style={{color:"var(--muted)"}}>{q.id==="workout"?"Log today's session":"Mark done"}</span>}
+          </button>
+        )}
+        {q.type==="checklist" && q.items.map((it,i)=>{
+          const v = rawP(log,today,q.id)||{}; const on = !!v[i];
+          return <button key={i} className="tapbtn" style={{flexBasis:"calc(50% - 5px)",gap:7,fontSize:".8125rem",...(on?primaryBtn:{})}} onClick={()=>onLog(q, {...v,[i]:!on}, true)}>
+            {on && <Check size={12}/>}{it}
+          </button>;
+        })}
+        {q.type==="weekly" && (
+          <button className="tapbtn" style={{flex:1,gap:8,...(numP(log,today,q)>0?primaryBtn:{})}} onClick={()=>onLog(q, numP(log,today,q)>0?0:1)}>
+            {numP(log,today,q)>0 ? <><Check size={14}/><span>Trained today</span></> : <span style={{color:"var(--muted)"}}>Log a session</span>}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ================================================================
+   MORNING CHECK-IN
+================================================================ */
+function CheckIn({quests, log, today, onAnswer, onFinish}){
+  const yesterday = addDays(today,-1);
+  const steps = [];
+  const wake = quests.find(x=>x.id==="wake" && !x.archived);
+  const bed = quests.find(x=>x.id==="bed" && !x.archived);
+  const clean = quests.find(x=>x.id==="clean" && !x.archived);
+  if (wake) steps.push({q:wake, date:today, icon:"sun", c:CATC.Sleep, text:"Did you wake by 06:00?"});
+  if (bed && yesterday>=bed.createdAt) steps.push({q:bed, date:yesterday, icon:"moon", c:CATC.Sleep, text:"Last night: in bed by 22:00, asleep by 22:30?"});
+  if (clean && !hasP(log,yesterday,"clean") && yesterday>=clean.createdAt) steps.push({q:clean, date:yesterday, icon:"leaf", c:CATC.Nutrition, text:"Was yesterday clean? No sugar, no junk."});
+  const [i,setI] = useState(0);
+  const finished = i>=steps.length;
+  useEffect(()=>{ if (finished) onFinish(); },[finished]);
+  if (finished) return null;
+  const s = steps[i];
+  return (
+    <Notice title="Morning check-in">
+      <div style={{display:"flex",alignItems:"center",gap:13,marginBottom:16}}>
+        <Sq k={s.icon} c={s.c} size={46} isz={21}/>
+        <div style={{fontSize:"1.0625rem",fontWeight:800,lineHeight:1.3,letterSpacing:"-0.01em"}}>{s.text}</div>
+      </div>
+      <div style={{display:"flex",gap:9}}>
+        <button className="tapbtn" style={{flex:1,height:52,background:"linear-gradient(135deg,var(--primary),var(--primary2))",color:"#fff",fontWeight:800,boxShadow:"0 8px 20px var(--prim-glow)"}} onClick={()=>{onAnswer(s.q,s.date,1); setI(i+1);}}>Yes</button>
+        <button className="tapbtn" style={{flex:1,height:52,background:"#fff",border:"1px solid var(--line)"}} onClick={()=>{onAnswer(s.q,s.date,0); setI(i+1);}}>No</button>
+      </div>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:14}}>
+        <span style={{fontSize:".6875rem",fontWeight:600,color:"var(--muted)"}}>Honest data only. It all runs on truth.</span>
+        <span style={{display:"flex",gap:5}}>{steps.map((_,x)=><span key={x} style={{width:6,height:6,borderRadius:"50%",background:x<=i?"var(--primary)":"rgba(36,34,60,0.12)"}}/>)}</span>
+      </div>
+    </Notice>
+  );
+}
+
+/* ================================================================
+   PROGRESS
+================================================================ */
+function TrendLine({points,w=320,h=86}){
+  if (points.length<2) return null;
+  const xs = points.map((p,i)=> i*(w-10)/(points.length-1)+5);
+  const ys = points.map(p=> h-10-(p/100)*(h-22));
+  const path = xs.map((x,i)=>`${i?"L":"M"}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(" ");
+  const area = path + ` L${xs[xs.length-1].toFixed(1)},${h-4} L${xs[0].toFixed(1)},${h-4} Z`;
+  return (
+    <svg width="100%" viewBox={`0 0 ${w} ${h}`} style={{display:"block"}}>
+      <defs><linearGradient id="tlg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="rgba(122,123,234,.22)"/><stop offset="100%" stopColor="rgba(122,123,234,0)"/>
+      </linearGradient></defs>
+      <path d={area} fill="url(#tlg)"/>
+      <path d={path} fill="none" stroke="var(--primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+      {xs.map((x,i)=><circle key={i} cx={x} cy={ys[i]} r={i===xs.length-1?4.5:2.4} fill={i===xs.length-1?"var(--deep)":"rgba(122,123,234,0.5)"} stroke={i===xs.length-1?"#fff":"none"} strokeWidth="2"/>)}
+    </svg>
+  );
+}
+
+function Heatmap({quests, log, today}){
+  /* Fills top-left → right → down: day 1 is the first cell. Once 13 weeks
+     of history exist this becomes a rolling window ending today. */
+  const active = quests.filter(q=>!q.archived);
+  const earliest = active.length ? active.reduce((m,q)=>q.createdAt<m?q.createdAt:m, active[0].createdAt) : today;
+  const start = daysBetween(earliest,today) >= 90 ? addDays(today,-90) : earliest;
+  const cells = Array.from({length:91},(_,i)=>{ const d=addDays(start,i); return {d, v: d>today ? -1 : vitality(active,log,d)}; });
+  return (
+    <div style={{display:"grid",gridTemplateColumns:"repeat(13,1fr)",gap:4}}>
+      {cells.map(c=>{
+        const bg = c.v<0 ? "rgba(36,34,60,0.04)" : c.v>=85?"#34B97B" : c.v>=60?"#7ED4A6" : c.v>=30?"#B5E6CC" : c.v>0?"#DDF3E7" : "var(--track)";
+        return <div key={c.d} title={c.v<0 ? c.d : `${c.d} · ${c.v}`} style={{aspectRatio:"1",borderRadius:5,background:bg}}/>;
+      })}
+    </div>
+  );
+}
+
+function Progress({quests, states, log, today, onOpen}){
+  const active = quests.filter(q=>!q.archived);
+  return (
+    <div style={{animation:"fadeIn .25s"}}>
+      <span className="eyebrow" style={{display:"block",margin:"0 6px 10px"}}>Goals · last 30 days</span>
+      <div className="card" style={{padding:"4px 20px",marginBottom:20,borderRadius:"var(--r-xl)"}}>
+        {active.map((q,idx)=>{
+          const A = states[q.id].A; const c = colorOf(q);
+          return (
+            <button key={q.id} onClick={()=>onOpen(q)} style={{display:"block",width:"100%",textAlign:"left",padding:"14px 0",borderTop:idx?"1px solid var(--line)":"none"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10,gap:10}}>
+                <span style={{fontSize:".875rem",fontWeight:700,display:"flex",gap:11,alignItems:"center",minWidth:0}}>
+                  <Sq k={iconOf(q)} c={c} size={30} isz={14}/>
+                  <span style={{whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{q.name}</span>
+                </span>
+                <span style={{display:"flex",alignItems:"center",gap:5,flexShrink:0}}>
+                  <span className="num" style={{fontSize:".9375rem",fontWeight:800,color:c}}>{A.toFixed(1)}</span>
+                  <span style={{fontSize:".625rem",fontWeight:600,color:"var(--faint)"}}>% · {stageOf(A).toLowerCase()}</span>
+                  <Chevron size={13}/>
+                </span>
+              </div>
+              <Dots30 q={q} state={states[q.id]} log={log} today={today} size={5}/>
+            </button>
+          );
+        })}
+        <div style={{padding:"12px 0 14px",display:"grid",gap:8}}>
+          <DotLegend items={[["complete","done"],["recovery","recovery"],["missed","missed"],["off","rest"]]}/>
+          <div style={{fontSize:".6875rem",fontWeight:500,color:"var(--faint)"}}>Tap a goal for its full 30-day view. Installs at 95%, about 66 honest reps; one miss costs nothing, two in a row starts decay.</div>
+        </div>
+      </div>
+
+      <span className="eyebrow" style={{display:"block",margin:"0 6px 10px"}}>Impact ledger · real quantities</span>
+      <div className="card" style={{padding:"6px 20px",marginBottom:20,borderRadius:"var(--r-xl)"}}>
+        {active.map((q,idx)=>{
+          const L = ledgerFor(q,log); if(!L) return null;
+          const fmtV = v => L.unit==="km"||L.unit==="h" ? v.toFixed(1) : Math.round(v).toLocaleString();
+          return (
+            <div key={q.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,padding:"14px 0",borderTop:idx?"1px solid var(--line)":"none"}}>
+              <div style={{minWidth:0}}>
+                <div style={{fontSize:".875rem",fontWeight:700}}>{q.name}</div>
+                <div style={{fontSize:".6875rem",fontWeight:500,color:"var(--faint)",marginTop:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{L.next ? "next: "+L.next[1] : "all listed milestones reached"}</div>
+              </div>
+              <div className="num" style={{fontSize:"1.125rem",fontWeight:800,whiteSpace:"nowrap",color:colorOf(q)}}>{fmtV(L.val)}<span style={{fontSize:".625rem",color:"var(--faint)",fontWeight:600}}> {L.unit}</span></div>
+            </div>
+          );
+        })}
+      </div>
+
+      <span className="eyebrow" style={{display:"block",margin:"0 6px 10px"}}>Vitality · last 13 weeks</span>
+      <div className="card" style={{padding:"18px 20px",marginBottom:8,borderRadius:"var(--r-xl)"}}>
+        <Heatmap quests={quests} log={log} today={today}/>
+      </div>
+    </div>
+  );
+}
+
+/* ================================================================
+   ARCHIVE
+================================================================ */
+function Archive({quests, log}){
+  const active = quests.filter(q=>!q.archived);
+  const reached = [];
+  for (const q of active){ const L=ledgerFor(q,log); if(L) L.hit.forEach(([v,label])=>reached.push({q:q.name,label,icon:iconOf(q),c:colorOf(q)})); }
+  const [open,setOpen] = useState(null);
+  return (
+    <div style={{animation:"fadeIn .25s"}}>
+      <span className="eyebrow" style={{display:"block",margin:"0 6px 10px"}}>Milestones reached</span>
+      {reached.length===0
+        ? <div className="card" style={{padding:"18px 20px",fontSize:".8125rem",fontWeight:500,color:"var(--muted)",lineHeight:1.6,borderRadius:"var(--r-xl)"}}>Nothing yet, and that is the point: every entry here will be a quantity you actually accumulated. The first ones land within a week or two of honest logging.</div>
+        : <div className="card" style={{padding:"6px 20px",borderRadius:"var(--r-xl)"}}>{reached.map((m,i)=>(
+            <div key={i} style={{display:"flex",gap:13,alignItems:"center",padding:"13px 0",borderTop:i?"1px solid var(--line)":"none"}}>
+              <Sq k={m.icon} c={m.c} size={36} isz={16}/>
+              <div><div style={{fontSize:".8125rem",fontWeight:700}}>{m.label}</div><div style={{fontSize:".6875rem",fontWeight:500,color:"var(--faint)"}}>{m.q}</div></div>
+            </div>))}</div>}
+      <span className="eyebrow" style={{display:"block",margin:"20px 6px 10px"}}>How Ace 3.0 works</span>
+      <div className="card" style={{padding:"18px 20px",marginBottom:20,borderRadius:"var(--r-xl)",fontSize:".8125rem",lineHeight:1.65}}>
+        Three numbers run Ace 3.0, and all of them are real. <b>Automaticity</b> is each habit's position on the 66-day formation curve. <b>Vitality</b> is today, weighted by health impact. The <b>ledger</b> counts true kilometres, litres, pages and hours. Never miss twice.
+      </div>
+      <span className="eyebrow" style={{display:"block",margin:"20px 6px 10px"}}>The evidence</span>
+      <div style={{fontSize:".75rem",fontWeight:500,color:"var(--muted)",margin:"0 6px 10px",lineHeight:1.5}}>Every mechanic is built on one of these. Associations found in research, not promises.</div>
+      {EVIDENCE.map(e=>(
+        <div key={e.id} className="card" style={{marginBottom:9,overflow:"hidden",borderRadius:"var(--r-lg)"}}>
+          <button className="rowbtn" onClick={()=>setOpen(open===e.id?null:e.id)}>
+            <span style={{textAlign:"left",fontWeight:700}}>{e.title}</span><Chevron dir={open===e.id?"down":"right"}/>
+          </button>
+          {open===e.id && <div style={{padding:"0 18px 16px",animation:"fadeIn .2s"}}>
+            <div style={{fontSize:".8125rem",lineHeight:1.6,color:"var(--ink)"}}>{e.body}</div>
+            <div style={{fontSize:".6875rem",fontWeight:500,color:"var(--faint)",marginTop:9}}>{e.src}</div>
+          </div>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ================================================================
+   SETTINGS
+================================================================ */
+function QuestEditor({q, onSave, onArchive, onClose}){
+  const [f,setF] = useState({name:q.name, sysName:q.sysName, target:q.target||1, step:q.step||1, unit:q.unit||"", perWeek:q.perWeek||5, recovery:q.recovery??"", weight:q.weight, cat:q.cat});
+  const set = (k,v)=>setF({...f,[k]:v});
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:100,background:"rgba(36,34,60,0.4)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",display:"flex",alignItems:"flex-end",justifyContent:"center"}} onClick={onClose}>
+      <div style={{width:"100%",maxWidth:520,background:"var(--card)",borderRadius:"32px 32px 0 0",maxHeight:"88vh",overflowY:"auto",boxShadow:"0 -10px 44px rgba(36,34,60,0.2)",animation:"rise .3s cubic-bezier(.22,1,.36,1)"}} onClick={e=>e.stopPropagation()}>
+        <div style={{width:44,height:5,borderRadius:99,background:"var(--track)",margin:"12px auto 0"}}/>
+        <div style={{display:"flex",alignItems:"center",gap:11,padding:"14px 20px 16px",borderBottom:"1px solid var(--line)"}}>
+          <Sq k={iconOf(q)} c={colorOf(q)} size={34} isz={16}/>
+          <span style={{fontSize:"1.0625rem",fontWeight:800}}>Edit quest</span>
+          <button onClick={onClose} style={{marginLeft:"auto",color:"var(--muted)",fontSize:"1.2rem",padding:"2px 6px"}}>×</button>
+        </div>
+        <div style={{padding:18,display:"grid",gap:13}}>
+          <div className="field"><label>Name</label><input value={f.name} onChange={e=>set("name",e.target.value)}/></div>
+          {q.type==="quantity" && <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
+            <div className="field"><label>Target/day</label><input type="number" step="any" value={f.target} onChange={e=>set("target",e.target.value)}/></div>
+            <div className="field"><label>Tap step</label><input type="number" step="any" value={f.step} onChange={e=>set("step",e.target.value)}/></div>
+            <div className="field"><label>Unit</label><input value={f.unit} onChange={e=>set("unit",e.target.value)}/></div>
+          </div>}
+          {q.type==="sessions" && <div className="field"><label>Sessions per day</label><input type="number" value={f.target} onChange={e=>set("target",e.target.value)}/></div>}
+          {q.type==="weekly" && <div className="field"><label>Sessions per week</label><input type="number" value={f.perWeek} onChange={e=>set("perWeek",e.target.value)}/></div>}
+          {q.type!=="weekly" && q.type!=="checklist" && <div className="field"><label>Recovery target after a miss (minimum viable rep)</label><input type="number" step="any" value={f.recovery} onChange={e=>set("recovery",e.target.value)}/></div>}
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+            <div className="field"><label>Category</label><select value={f.cat} onChange={e=>set("cat",e.target.value)}>{["Sleep","Movement","Mind","Nutrition","Hydration"].map(c=><option key={c}>{c}</option>)}</select></div>
+            <div className="field"><label>Vitality weight</label><input type="number" step="any" value={f.weight} onChange={e=>set("weight",e.target.value)}/></div>
+          </div>
+          <button className="tapbtn" style={{height:52,background:"linear-gradient(135deg,var(--primary),var(--primary2))",color:"#fff",fontWeight:800,boxShadow:"0 8px 20px var(--prim-glow)"}} onClick={()=>onSave({
+            name:f.name, sysName:f.sysName, target:parseFloat(f.target)||q.target, step:parseFloat(f.step)||q.step,
+            unit:f.unit, perWeek:parseInt(f.perWeek)||q.perWeek, weight:parseFloat(f.weight)||q.weight, cat:f.cat,
+            recovery: f.recovery==="" ? undefined : parseFloat(f.recovery)
+          })}>Save changes</button>
+          <button className="tapbtn" style={{background:"var(--decay-soft)",color:"var(--decay)",fontSize:".8125rem"}} onClick={onArchive}>{q.archived?"Restore quest":"Archive quest"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const REMINDERS = [
+  ["06:00","Wake up. Check in."],["08:00","Supplements: protein, creatine, magnesium, fish oil."],["12:30","Water check: 1.5 L by now."],
+  ["18:30","Training window open."],["21:00","Reading + wind down."],["21:45","Phone down. Bed by 22:00."]
+];
+
+function Settings({store, setStore, onOpenEdit, onAddQuest}){
+  const fileRef = useRef();
+  const exportData = () => {
+    const blob = new Blob([JSON.stringify(store,null,2)],{type:"application/json"});
+    const a = document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`ace30-backup-${ld()}.json`; a.click();
+  };
+  const importData = e => {
+    const f=e.target.files&&e.target.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=ev=>{ try{ setStore(migrate(JSON.parse(ev.target.result))); alert("Data restored."); }catch(x){ alert("That file could not be read. It must be an Ace backup JSON."); } };
+    r.readAsText(f); e.target.value="";
+  };
+  return (
+    <div style={{animation:"fadeIn .25s"}}>
+      <span className="eyebrow" style={{display:"block",margin:"0 6px 10px"}}>Quests</span>
+      <div className="card" style={{padding:"4px 8px",marginBottom:10,borderRadius:"var(--r-xl)"}}>
+        {store.quests.map((q,i)=>(
+          <button key={q.id} className="rowbtn" style={{opacity:q.archived?0.45:1,borderTop:i?"1px solid var(--line)":"none",background:"none"}} onClick={()=>onOpenEdit(q)}>
+            <span style={{textAlign:"left",display:"flex",gap:12,alignItems:"center",fontWeight:700}}><Sq k={iconOf(q)} c={colorOf(q)} size={32} isz={15}/>{q.name}{q.archived?" · archived":""}</span><Chevron/>
+          </button>
+        ))}
+      </div>
+      <button className="rowbtn card" style={{marginBottom:6,color:"var(--muted)",borderStyle:"dashed",borderRadius:"var(--r-lg)"}} onClick={onAddQuest}>
+        <span>New quest</span><span style={{fontSize:"1.15rem"}}>+</span>
+      </button>
+
+      <span className="eyebrow" style={{display:"block",margin:"20px 6px 10px"}}>Reminders · one-time iPhone setup</span>
+      <div className="card" style={{padding:"18px 20px",fontSize:".8125rem",lineHeight:1.6,borderRadius:"var(--r-xl)"}}>
+        <p style={{marginBottom:10,color:"var(--muted)"}}>Ace cannot wake your phone from the browser, but iOS can. Set these once in the Shortcuts app; they run daily, forever, free:</p>
+        <p style={{marginBottom:12}}>Shortcuts app → Automation → + → <b>Time of Day</b> → set time, Daily → choose <b>Run Immediately: Off</b> → Next → search the action <b>Show Notification</b> → type the text below → Done. Repeat per row.</p>
+        {REMINDERS.map(([t,txt])=>(
+          <div key={t} style={{display:"flex",gap:14,padding:"9px 0",borderTop:"1px solid var(--line)"}}>
+            <span className="num" style={{color:"var(--primary)",fontSize:".75rem",fontWeight:800,width:46,flexShrink:0}}>{t}</span>
+            <span style={{fontSize:".8125rem"}}>{txt}</span>
+          </div>
+        ))}
+      </div>
+
+      <span className="eyebrow" style={{display:"block",margin:"20px 6px 10px"}}>Data</span>
+      <button className="rowbtn card" style={{marginBottom:7,borderRadius:"var(--r-lg)"}} onClick={exportData}><span>Export backup (JSON)</span><Chevron/></button>
+      <button className="rowbtn card" style={{marginBottom:7,borderRadius:"var(--r-lg)"}} onClick={()=>fileRef.current.click()}><span>Restore from backup</span><Chevron/></button>
+      <input ref={fileRef} type="file" accept=".json" style={{display:"none"}} onChange={importData}/>
+      <button className="rowbtn card" style={{marginBottom:7,color:"var(--decay)",borderRadius:"var(--r-lg)"}} onClick={()=>{ if(confirm("Erase ALL Ace data on this device? Export a backup first.")) setStore({...EMPTY_STORE, quests:DEFAULT_QUESTS.map(q=>({...q,createdAt:ld()}))}); }}>
+        <span>Erase everything</span><Chevron/>
+      </button>
+      <div style={{fontSize:".6875rem",fontWeight:500,color:"var(--faint)",margin:"10px 6px 0",lineHeight:1.5}}>
+        Data lives only in this browser until sync ships in phase 2. Export a backup weekly.
+      </div>
+    </div>
+  );
+}
+
+/* ================================================================
+   APP
+================================================================ */
+function App(){
+  const [store,setStoreRaw] = useState(loadStore);
+  const [tab,setTab] = useState("today");
+  const [today,setToday] = useState(ld());
+  const [editQ,setEditQ] = useState(null);
+  const [toast,setToast] = useState(null);
+  const [expanded,setExpanded] = useState({});
+  const [detailQ,setDetailQ] = useState(null);
+  const setStore = useCallback(u=>{ setStoreRaw(prev=>{ const next = typeof u==="function"?u(prev):u; saveStore(next); return next; }); },[]);
+
+  useEffect(()=>{ const t=setInterval(()=>{ const n=ld(); setToday(p=>p===n?p:n); },30000); return ()=>clearInterval(t); },[]);
+
+  const active = store.quests.filter(q=>!q.archived);
+  const states = useMemo(()=>{ const m={}; for(const q of active) m[q.id]=questState(q,store.log,today); return m; },[store.quests,store.log,today]);
+  const vToday = useMemo(()=>vitality(active,store.log,today),[store.quests,store.log,today]);
+  const meanA = active.length? active.reduce((s,q)=>s+states[q.id].A,0)/active.length : 0;
+  const RANKS=[[0,"E"],[15,"D"],[30,"C"],[45,"B"],[60,"A"],[75,"S"],[88,"SS"],[95,"SSS"]];
+  const rank = RANKS.reduce((r,[m,t])=>meanA>=m?t:r,"E");
+
+  const needCheckin = !store.checkins[today];
+
+  const logValue = useCallback((q, value, isObj)=>{
+    setStore(prev=>{
+      const day = {...(prev.log[today]||{})};
+      day[q.id] = value;
+      const log = {...prev.log,[today]:day};
+      const before = ledgerFor(q, prev.log), after = ledgerFor(q, log);
+      let seen = prev.seen, t=null;
+      if (before && after){
+        const newly = after.hit.filter(([v])=>!before.hit.some(([bv])=>bv===v));
+        for (const [v,label] of newly){ const id=q.id+"_"+v; if(!prev.seen[id]){ seen={...seen,[id]:true}; t={title:"Milestone",body:label,sub:q.name}; } }
+      }
+      if (t){ setToast(t); setTimeout(()=>setToast(null),4200); }
+      return {...prev, log, seen};
+    });
+  },[today,setStore]);
+
+  const answerCheckin = (q,date,val)=> setStore(prev=>({...prev, log:{...prev.log,[date]:{...(prev.log[date]||{}),[q.id]:val}}}));
+  const finishCheckin = ()=> setStore(prev=>({...prev, checkins:{...prev.checkins,[today]:true}}));
+  const saveQuest = (patch)=>{ setStore(prev=>({...prev, quests:prev.quests.map(x=>x.id===editQ.id?{...x,...patch}:x)})); setEditQ(null); };
+  const archiveQuest = ()=>{ setStore(prev=>({...prev, quests:prev.quests.map(x=>x.id===editQ.id?{...x,archived:!x.archived}:x)})); setEditQ(null); };
+  const addQuest = ()=>{
+    const name = prompt("Quest name:"); if(!name) return;
+    const q = { id:"q"+Date.now().toString(36), name, sysName:name.toUpperCase(), type:"quantity", target:1, step:1, unit:"", recovery:undefined,
+      cat:"Mind", weight:10, schedule:{kind:"daily"}, ledger:null, createdAt:ld(), archived:false };
+    setStore(prev=>({...prev,quests:[...prev.quests,q]}));
+    setEditQ(q);
+  };
+
+  const schedToday = q => q.schedule.kind==="weekly" || isScheduled(q,today);
+  const todayActive = active.filter(schedToday);
+  const restQuests = active.filter(q=>!schedToday(q));
+  const isDone = q => q.schedule.kind==="weekly" ? numP(store.log,today,q)>0 : numP(store.log,today,q)>=targetOf(q);
+  const recoveries = todayActive.filter(q=>q.schedule.kind!=="weekly" && states[q.id].recoveryActive && numP(store.log,today,q) < targetOf(q));
+  const recSet = new Set(recoveries.map(q=>q.id));
+  const openQuests = todayActive.filter(q=>!isDone(q)).sort((a,b)=>(recSet.has(b.id)-recSet.has(a.id)));
+  const doneQuests = todayActive.filter(isDone);
+  const clearedCount = doneQuests.length, totalCount = todayActive.length;
+
+  const goLog = ()=>{ setTab("log"); window.scrollTo(0,0); };
+  const hello = (()=>{ const h=new Date().getHours(); return h<12?"Good Morning":h<18?"Good Afternoon":"Good Evening"; })();
+  const TITLES = { today:null, log:"Quest Log", progress:"Progress", archive:"Archive", settings:"Settings" };
+
+  return (
+    <div style={{maxWidth:520,margin:"0 auto",padding:"10px 16px calc(104px + env(safe-area-inset-bottom))"}}>
+      <header style={{paddingTop:"calc(env(safe-area-inset-top) + 10px)",marginBottom:16}}>
+        <div style={{display:"flex",alignItems:"center",gap:13}}>
+          <RankBadge rank={rank} onClick={()=>{setTab("progress");window.scrollTo(0,0);}}/>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:".75rem",fontWeight:600,color:"var(--muted)"}}>{TITLES[tab] ? "Ace 3.0" : hello}</div>
+            <div style={{fontSize:"1.125rem",fontWeight:800,letterSpacing:"-0.01em",lineHeight:1.2}}>
+              {TITLES[tab] || "Nabin"}
+            </div>
+          </div>
+          <button className="iconbtn" aria-label="Check-in status" onClick={()=>{setTab("today");window.scrollTo(0,0);}}>
+            <Icon k="bell" size={19} c="var(--ink)"/>
+            {needCheckin && <span style={{position:"absolute",top:10,right:11,width:8,height:8,borderRadius:"50%",background:"var(--decay)",border:"2px solid #fff"}}/>}
+          </button>
+        </div>
+      </header>
+
+      {toast && (
+        <div style={{position:"fixed",top:"calc(12px + env(safe-area-inset-top))",left:"50%",transform:"translateX(-50%)",zIndex:200,width:"min(92%,460px)"}}>
+          <div className="card" style={{display:"flex",alignItems:"center",gap:13,padding:"14px 16px",borderRadius:24,boxShadow:"var(--sh)",animation:"popIn .3s cubic-bezier(.22,1,.36,1)"}}>
+            <Sq k="spark" c="#FFB020" size={40} isz={18}/>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontSize:".875rem",fontWeight:800}}>{toast.body}</div>
+              <div style={{fontSize:".6875rem",fontWeight:600,color:"var(--muted)",marginTop:2}}>{toast.sub} · a real quantity, not a badge</div>
+            </div>
+            <button onClick={()=>setToast(null)} aria-label="Dismiss" style={{color:"var(--muted)",fontSize:"1.1rem",padding:"0 4px"}}>×</button>
+          </div>
+        </div>
+      )}
+
+      {tab==="today" && (
+        <div style={{animation:"fadeIn .25s"}}>
+          <Dashboard quests={store.quests} states={states} log={store.log} today={today} vToday={vToday} onGoLog={goLog} onOpen={setDetailQ}
+            notices={<React.Fragment>
+              {needCheckin && <CheckIn quests={store.quests} log={store.log} today={today} onAnswer={answerCheckin} onFinish={finishCheckin}/>}
+              {!needCheckin && recoveries.length>0 && (
+                <Notice title="Recovery" tone="decay">
+                  <div style={{fontSize:".8125rem",lineHeight:1.55}}>
+                    {recoveries.length===1 ? "One quest was missed yesterday." : recoveries.length+" quests were missed yesterday."} Never miss twice: clear the reduced target in the Log and the chain counts as unbroken.
+                  </div>
+                </Notice>
+              )}
+            </React.Fragment>}/>
+        </div>
+      )}
+
+      {tab==="log" && (
+        <div style={{animation:"fadeIn .25s"}}>
+          {needCheckin && <CheckIn quests={store.quests} log={store.log} today={today} onAnswer={answerCheckin} onFinish={finishCheckin}/>}
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",margin:"2px 6px 12px"}}>
+            <span style={{fontSize:".75rem",fontWeight:600,color:"var(--muted)"}}>{fmtDay(today)}</span>
+            <span className="pill"><Icon k="spark" size={12} c="var(--primary)"/>{clearedCount} of {totalCount} cleared</span>
+          </div>
+          {openQuests.map(q=><QuestCard key={q.id} q={q} log={store.log} today={today} state={states[q.id]} onLog={logValue} onOpenEdit={setEditQ}/>)}
+          {doneQuests.length>0 && <div className="eyebrow" style={{margin:"20px 6px 10px"}}>Cleared</div>}
+          {doneQuests.map(q=> expanded[q.id]
+            ? <QuestCard key={q.id} q={q} log={store.log} today={today} state={states[q.id]} onLog={logValue} onOpenEdit={setEditQ}/>
+            : <QuestCard key={q.id} q={q} log={store.log} today={today} state={states[q.id]} onLog={logValue} onOpenEdit={setEditQ} compact onExpand={()=>setExpanded(e=>({...e,[q.id]:true}))}/>)}
+          {restQuests.length>0 && <div className="eyebrow" style={{margin:"20px 6px 10px"}}>Rest day · optional</div>}
+          {restQuests.map(q=><QuestCard key={q.id} q={q} log={store.log} today={today} state={states[q.id]} onLog={logValue} onOpenEdit={setEditQ}/>)}
+        </div>
+      )}
+      {tab==="progress" && <Progress quests={store.quests} states={states} log={store.log} today={today} onOpen={setDetailQ}/>}
+      {tab==="archive" && <Archive quests={store.quests} log={store.log}/>}
+      {tab==="settings" && <Settings store={store} setStore={setStore} onOpenEdit={setEditQ} onAddQuest={addQuest}/>}
+
+      {editQ && <QuestEditor q={editQ} onSave={saveQuest} onArchive={archiveQuest} onClose={()=>setEditQ(null)}/>}
+      {detailQ && states[detailQ.id] && <QuestDetail q={store.quests.find(x=>x.id===detailQ.id)||detailQ} state={states[detailQ.id]} log={store.log} today={today} onClose={()=>setDetailQ(null)}/>}
+
+      {/* Bottom nav — four tabs + the diamond Log FAB */}
+      <nav style={{position:"fixed",bottom:0,left:0,right:0,background:"rgba(255,255,255,0.86)",backdropFilter:"blur(26px) saturate(1.4)",WebkitBackdropFilter:"blur(26px) saturate(1.4)",borderTop:"1px solid rgba(255,255,255,.7)",paddingBottom:"env(safe-area-inset-bottom)",zIndex:50,boxShadow:"0 -14px 40px rgba(76,72,150,.14)"}}>
+        <div style={{maxWidth:520,margin:"0 auto",display:"flex",alignItems:"stretch",position:"relative"}}>
+          {[["today","Home","home"],["progress","Stats","trend"]].map(([k,l,ic])=>(
+            <button key={k} onClick={()=>{setTab(k);window.scrollTo(0,0);}} style={{flex:1,padding:"12px 0 10px",display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+              <Icon k={ic} size={20} c={tab===k?"var(--primary)":"var(--faint)"} sw={tab===k?2.3:1.9}/>
+              <span style={{fontSize:".5938rem",fontWeight:700,color:tab===k?"var(--primary)":"var(--faint)"}}>{l}</span>
+            </button>
+          ))}
+          <div style={{width:76,position:"relative"}}>
+            <button onClick={goLog} aria-label="Open quest log"
+              style={{position:"absolute",left:"50%",top:-26,transform:"translateX(-50%) rotate(45deg)",width:56,height:56,borderRadius:19,
+                background:tab==="log"?"linear-gradient(135deg,var(--deep),var(--primary))":"linear-gradient(140deg,#8B87F1 0%,var(--primary) 45%,var(--primary2) 100%)",
+                boxShadow:"var(--sh-fab), inset 0 1.5px 0 rgba(255,255,255,.45)",display:"flex",alignItems:"center",justifyContent:"center",transition:"filter .15s"}}>
+              <span style={{transform:"rotate(-45deg)",display:"flex"}}><Icon k="pen" size={21} c="#fff" sw={2.1}/></span>
+            </button>
+            <span style={{position:"absolute",left:"50%",bottom:9,transform:"translateX(-50%)",fontSize:".5938rem",fontWeight:700,color:tab==="log"?"var(--primary)":"var(--faint)"}}>Log</span>
+          </div>
+          {[["archive","Archive","arch"],["settings","Settings","gear"]].map(([k,l,ic])=>(
+            <button key={k} onClick={()=>{setTab(k);window.scrollTo(0,0);}} style={{flex:1,padding:"12px 0 10px",display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+              <Icon k={ic} size={20} c={tab===k?"var(--primary)":"var(--faint)"} sw={tab===k?2.3:1.9}/>
+              <span style={{fontSize:".5938rem",fontWeight:700,color:tab===k?"var(--primary)":"var(--faint)"}}>{l}</span>
+            </button>
+          ))}
+        </div>
+      </nav>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+
+/* PWA */
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>
